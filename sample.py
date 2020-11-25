@@ -5,6 +5,7 @@ import numpy as np
 from picamera.array import PiRGBArray
 from picamera import PiCamera
 import time
+import requests
 
 camera = PiCamera()
 camera.resolution = (128, 80)
@@ -12,7 +13,7 @@ camera.framerate = 32
 rawCapture = PiRGBArray(camera, size=(128, 80))
 
 time.sleep(0.1)
-
+url=['http://127.0.0.1:8080/a','http://127.0.0.1:8080/w','http://127.0.0.1:8080/d','http://127.0.0.1:8080/s']
 def rescale_frame(frame, percent=75):
     width = int(frame.shape[1] * percent/ 100)
     height = int(frame.shape[0] * percent/ 100)
@@ -21,7 +22,7 @@ def rescale_frame(frame, percent=75):
 
 for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
     img = frame.array
-    cv2.imshow("Frame", img)
+    #cv2.imshow("Frame", img)
     key = cv2.waitKey(1) & 0xFF
     rawCapture.truncate(0)
     if key == ord("q"):
@@ -29,9 +30,6 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
     
     fig=plt.figure(figsize=(20, 20))
 
-    # Load img
-    #img = cv2.imread("test" + str(i) + ".jpg")
-    # 해상도 낮춤 (72, 128, 3)
     img = rescale_frame(img, 10)
     # BGR -> HSV
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
@@ -57,7 +55,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
     #plt.imshow(img)
 
     #plt.show()
-    #cv2.imshow("Frame", img)
+    cv2.imshow("Frame", img)
     #go?
     left = 0
     front = 0
@@ -67,15 +65,18 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
         for j in range(len(img[i])):
             if j <= 3:
                 left += img[i][j]
-            elif 4 <= j and j <= 5:
+            elif 4 <= j and j <= 7:
                 front += img[i][j]
-            elif 6<= j:
+            elif 8 <= j:
                 right += img[i][j]
-    d = max(left, front, right)
-    left /= d
-    front /= d
-    right /= d
-    print("Left", "Front", "Right")
-    print(left, front, right)
-    time.sleep(0.5)
 
+    d = max(left, front, right)
+    if d==0:
+        requests.get(url[3])
+    else:    
+        left /= d
+        front /= d
+        right /= d
+        list=[left,front,right]
+        requests.get(url[list.index(max(list))])
+    

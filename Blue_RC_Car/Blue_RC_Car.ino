@@ -5,7 +5,7 @@
 
 unsigned char m_a_spd = 0, m_b_spd = 0; //모터의 속력을 저장하는 전역변수
 boolean m_a_dir = 0, m_b_dir = 0;       //모터의 방향을 결정하는 전역변수
-unsigned char MOTOR_SPEED = 145;        //모터의 기준속력입니다(0~255)
+unsigned char MOTOR_SPEED = 150;        //모터의 기준속력입니다(0~255)
 
 void setup()
 {
